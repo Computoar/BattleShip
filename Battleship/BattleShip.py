@@ -23,6 +23,7 @@ board_array_computer = [[x for x in range(10)] for y in range(10)]
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 def main():
+    # Hello
     welcome_prompt()
     run_game()
 
