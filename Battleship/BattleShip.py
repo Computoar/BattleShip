@@ -10,8 +10,10 @@ __author__ = 'Emma & Lee'
 
 
 # Create 2 global lists for our boards.
-board_array_user = [[x for x in range(10)] for y in range(10)]
-board_array_computer = [[x for x in range(10)] for y in range(10)]
+board_array_user = [[' ' for z in range(10)] for z in range(10)]
+board_array_computer = [[' ' for z in range(10)] for z in range(10)]
+ship_list_user = ['AAAAA', 'BBBB', 'SSS', 'PP']
+ship_list_computer = ['AAAAA', 'BBBB', 'SSS', 'PP']
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -148,8 +150,33 @@ def number_to_letter(integer):
 #   Post:
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-def auto_place_ships(list):
-    print 'Autoplace'
+def auto_place_ships(bool_user):
+    place = True
+    board = board_array_user if bool_user else board_array_computer
+    ship_list = ship_list_user if bool_user else ship_list_computer
+    while place:
+        x = random.randint(1, 10) - 1
+        y = random.randint(1, 10) - 1
+        orientation = random.randint(0, 1)
+
+        for i in range(ship_list):  # For each of the ships in the list...  ['AAAAA', 'BBBB', 'SSS', 'PP']
+            if orientation == 1:  # Vertical orientation
+                for j in range(ship_list[i]):  # For one particular ship 'AAAAA'
+                    while (x + j) < 10:
+                        x = random.randint(1, 10) - 1  # Check to make sure the ship won't go off the board.
+                    board[x + j][y] = ship_list[j]  # The board's info @ x + j = the letter of the particular ship
+                    x = random.randint(1, 10) - 1  # New coordinate point for next ship assigned.
+                    y = random.randint(1, 10) - 1  # New coordinate point for next ship assigned.
+                    orientation = random.randint(0, 1)  # New rotation for next ship assigned.
+            else:
+                for i in range(ship_list):  # For each of the ships in the list...  ['AAAAA', 'BBBB', 'SSS', 'PP']
+                    for j in range(ship_list[i]):  # For one particular ship 'AAAAA'
+                        while (y + j) < 10:
+                            y = random.randint(1, 10) - 1  # Check to make sure the ship won't go off the board.
+                        board[x][y + j] = ship_list[j]  # The board's info @ x + j = the letter of the particular ship
+                        x = random.randint(1, 10) - 1  # New coordinate point for next ship assigned.
+                        y = random.randint(1, 10) - 1  # New coordinate point for next ship assigned.
+                        orientation = random.randint(0, 1)  # New rotation for next ship assigned.
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
