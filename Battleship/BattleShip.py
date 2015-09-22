@@ -158,7 +158,12 @@ def auto_place_ships(bool_user):
         x = random.randint(1, 10) - 1
         y = random.randint(1, 10) - 1
         orientation = random.randint(0, 1)
-#maybe
+
+#for each item in the array, do shit
+    #for each array's item's length ('AAAAA')
+        #set it's position + the length to it's values.
+        #possibly add the tile to a point to keep track of?
+
         for i in range(ship_list):  # For each of the ships in the list...  ['AAAAA', 'BBBB', 'SSS', 'PP']
             if orientation == 1:  # Vertical orientation
                 for j in range(ship_list[i]):  # For one particular ship 'AAAAA'
