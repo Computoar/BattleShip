@@ -114,28 +114,41 @@ def manually_place_ships():
     for ship in ships.keys():
         valid = False
         count = 0
-        placement = ""
         while not valid:  # Loop through the validation, choosing random numbers till spot is found.
             if count == 0:
-                placement = raw_input('Please enter you coordinate points for ' + ship + ' (col, row, v/h): ').lower()
+                placement = raw_input(
+                    'Please enter your coordinate points for the ' + ship + ' (col, row, v/h): ').lower()
                 count += 1  # Add 1 to the count
             else:
-                placement = raw_input('Invalid placement, please try again for ' + ship + ' (col, row, v/h): ').lower()
+                placement = raw_input(
+                    'Invalid placement, please try again for the ' + ship + ' (col, row, v/h): ').lower()
 
             position = placement.strip('()')  # Remove the '(' and ')' if the user entered them.
             position = position.replace(' ', '')  # Remove all blank space.
             position = position.split(",")  # Position is now an array of strings.
 
+            print(position[0])
+            print(position[1])
+            print(position[2])
+
             if position[2] != 'v' or position[2] != 'h':
-                valid = False
+                print("Not a 'v' or 'h'")
                 continue
 
-            x = random.randint(0, 9)  # Choose random number 0-9
-            y = random.randint(0, 9)
-            o = random.randint(0, 1)
+            if not represents_int(position[0]):
+                print('Col is wrong')
+                continue
+
+            if not represents_int(position[1]):
+                print('Hor is wrong')
+                continue
+
+            x = int(position[0])  # Assign x position
+            y = int(position[1])  # Assign y position
+            o = 0 if position[2] == 'v' else 1  # Assign vertical/horizontal
+
             valid = can_place(board, ships[ship], x, y, o)  # Make sure we can place the ship there.
         board = place_ship(board, ships[ship], ship[0], x, y, o)  # We passed the tests, place the ship at that spot
-
     return board
 
 
@@ -159,7 +172,6 @@ def auto_place_ships():
             o = random.randint(0, 1)
             valid = can_place(board, ships[ship], x, y, o)  # Make sure we can place the ship there.
         board = place_ship(board, ships[ship], ship[0], x, y, o)  # We passed the tests, place the ship at that spot
-
     return board
 
 
