@@ -1,19 +1,14 @@
 import os
+import re
 import random
 import time
 
 __author__ = 'Emma & Lee'
 
+
 # '''
 # Program Prologue
 # '''
-
-
-# Create 2 global lists for our boards.
-board_array_user = [[' ' for z in range(10)] for z in range(10)]
-board_array_computer = [[' ' for z in range(10)] for z in range(10)]
-ship_list_user = ['AAAAA', 'BBBB', 'SSS', 'PP']
-ship_list_computer = ['AAAAA', 'BBBB', 'SSS', 'PP']
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -60,21 +55,27 @@ def welcome_prompt():
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 def run_game():
     # Initialize the board
-    initialize_board()
+    user_board = initialize_board(True)
+    computer_board = initialize_board(False)
+
+    # TODO REMOVE THESE
+    print_out_board(user_board, True)
+    print_out_board(computer_board, False)
+    # TODO REMOVE THESE
 
     # While the game is NOT over, continue playing the game.
     while not is_game_over():
-        print_out_board(True)
+        print_out_board(user_board, True)
         make_move_user()
         is_ship_sunken()
         if is_game_over():
-            print 'game over! You won! WOOHOO!'
+            print 'GAME OVER! You won! WOOHOO!'
 
-        print_out_board(True)
+        print_out_board(computer_board, False)
         make_move_comp()
         is_ship_sunken()
         if is_game_over():
-            print 'game over! Computer beat ya...'
+            print 'GAME OVER! Computer beat ya...'
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -85,115 +86,125 @@ def run_game():
 #   Post:
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-def initialize_board():
-    # Place the computer's ships.
-    # auto_place_ships()
-
+def initialize_board(bool_user):
     # Checks if the input is lowercase y
-    if raw_input('Would you like to have your ships auto-deployed? y or n: ').lower() == "y":
-        # Obviously yes, so auto-place ships.
-        auto_place_ships()
+    if bool_user:
+        if raw_input('Would you like to have your ships auto-deployed? y or n: ').lower() == "y":
+            # Obviously yes, so auto-place ships.
+            return auto_place_ships()
+        else:
+            # Manually place them...false
+            return manually_place_ships()
     else:
-        # Manually place them...false
-        manually_place_ships()
+        return auto_place_ships()
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#   Function: print_out_board(bool_player)
+#   Function: manually_place_ships()
 #
 #   Pre:
 #
 #   Post:
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-def print_out_board(bool_player):
-    # Clear the screen
-    # cls() TODO UN-COMMENT THIS WHEN FINISHED
+def manually_place_ships():
+    board = ([[' ' for z in range(10)] for z in range(10)])  # Initialize board's slots to ' '. A 10x10 board is made.
+    ships = {"Aircraft carrier": 5, "Battleship": 4, "Submarine": 3, "Destroyer": 3, "Patrol boat": 2}  # Ship list
 
-    print('User\'s Board:\n     1     2     3     4     5     6     7     8     9     10\n')
-
-    # Ternary operator which decides which board to display. True = Player, False = Computer
-    board = board_array_user if bool_player else board_array_computer
-
-    for i in range(len(board)):
-        print(number_to_letter(i) + "  "),  # THIS COMMA IS NEEDED HERE TO NOT PRINT ON TO THE NEXT LINE!!!!
-        for j in range(len(board)):
-            if j < 9:
-                print ' {:}  |'.format(board[i][j]),  # KEEP THIS COMMA!!!!
+    for ship in ships.keys():
+        valid = False
+        count = 0
+        placement = ""
+        while not valid:  # Loop through the validation, choosing random numbers till spot is found.
+            if count == 0:
+                placement = raw_input('Please enter you coordinate points for ' + ship + ' (col, row, v/h): ').lower()
+                count += 1  # Add 1 to the count
             else:
-                print ' {:}'.format(board[i][j]),  # KEEP THIS COMMA!!!!
-        if i < 9:
-            print('\n   ------------------------------------------------------------')
+                placement = raw_input('Invalid placement, please try again for ' + ship + ' (col, row, v/h): ').lower()
 
-    print '\n\n\n'
+            position = placement.strip('()')  # Remove the '(' and ')' if the user entered them.
+            position = position.replace(' ', '')  # Remove all blank space.
+            position = position.split(",")  # Position is now an array of strings.
+
+            if position[2] != 'v' or position[2] != 'h':
+                valid = False
+                continue
+
+            x = random.randint(0, 9)  # Choose random number 0-9
+            y = random.randint(0, 9)
+            o = random.randint(0, 1)
+            valid = can_place(board, ships[ship], x, y, o)  # Make sure we can place the ship there.
+        board = place_ship(board, ships[ship], ship[0], x, y, o)  # We passed the tests, place the ship at that spot
+
+    return board
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#   Function: number_to_letter(int)
+#   Function: auto_place_ships()
 #
 #   Pre:
 #
 #   Post:
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-def number_to_letter(integer):
-    letter_array = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
-                    'U', 'V', 'W', 'X', 'Y', 'Z']
-    return letter_array[integer]
+def auto_place_ships():
+    board = ([[' ' for z in range(10)] for z in range(10)])  # Initialize board's slots to ' '. A 10x10 board is made.
+    ships = {"A": 5, "B": 4, "S": 3, "D": 3, "P": 2}  # Ship list
+
+    for ship in ships.keys():
+        valid = False
+        while not valid:  # Loop through the validation, choosing random numbers till spot is found.
+            x = random.randint(0, 9)  # Choose random number 0-9
+            y = random.randint(0, 9)
+            o = random.randint(0, 1)
+            valid = can_place(board, ships[ship], x, y, o)  # Make sure we can place the ship there.
+        board = place_ship(board, ships[ship], ship[0], x, y, o)  # We passed the tests, place the ship at that spot
+
+    return board
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#   Function: auto_place_ships(list)
+#   Function: can_place(list)
 #
 #   Pre:
 #
 #   Post:
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-def auto_place_ships(bool_user):
-    place = True
-    board = board_array_user if bool_user else board_array_computer
-    ship_list = ship_list_user if bool_user else ship_list_computer
-    while place:
-        x = random.randint(1, 10) - 1
-        y = random.randint(1, 10) - 1
-        orientation = random.randint(0, 1)
+def can_place(board, ship, x, y, o):
+    if o == 0 and x + ship > 10:  # Vertical
+        return False
+    elif o == 1 and y + ship > 10:  # Horizontal
+        return False
+    else:
+        if o == 0:  # Vertical
+            for i in range(ship):
+                if board[x + i][y] != ' ':
+                    return False
+        elif o == 1:  # Horizontal
+            for i in range(ship):
+                if board[x][y + i] != ' ':
+                    return False
 
-#for each item in the array, do shit
-    #for each array's item's length ('AAAAA')
-        #set it's position + the length to it's values.
-        #possibly add the tile to a point to keep track of?
-
-        for i in range(ship_list):  # For each of the ships in the list...  ['AAAAA', 'BBBB', 'SSS', 'PP']
-            if orientation == 1:  # Vertical orientation
-                for j in range(ship_list[i]):  # For one particular ship 'AAAAA'
-                    while (x + j) < 10:
-                        x = random.randint(1, 10) - 1  # Check to make sure the ship won't go off the board.
-                    board[x + j][y] = ship_list[j]  # The board's info @ x + j = the letter of the particular ship
-                    x = random.randint(1, 10) - 1  # New coordinate point for next ship assigned.
-                    y = random.randint(1, 10) - 1  # New coordinate point for next ship assigned.
-                    orientation = random.randint(0, 1)  # New rotation for next ship assigned.
-            else:
-                for i in range(ship_list):  # For each of the ships in the list...  ['AAAAA', 'BBBB', 'SSS', 'PP']
-                    for j in range(ship_list[i]):  # For one particular ship 'AAAAA'
-                        while (y + j) < 10:
-                            y = random.randint(1, 10) - 1  # Check to make sure the ship won't go off the board.
-                        board[x][y + j] = ship_list[j]  # The board's info @ x + j = the letter of the particular ship
-                        x = random.randint(1, 10) - 1  # New coordinate point for next ship assigned.
-                        y = random.randint(1, 10) - 1  # New coordinate point for next ship assigned.
-                        orientation = random.randint(0, 1)  # New rotation for next ship assigned.
+    return True
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#   Function: manually_place_ships(col, row, pos, list)
+#   Function: place_ship(list)
 #
 #   Pre:
 #
 #   Post:
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-def manually_place_ships(col, row, pos, list):
-    print 'Manually place'
+def place_ship(board, ship, name, x, y, o):
+    if o == 0:  # Vertical
+        for i in range(ship):
+            board[x + i][y] = name
+    elif o == 1:  # Horizontal
+        for i in range(ship):
+            board[x][y + i] = name
+    return board
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -246,6 +257,18 @@ def is_game_over():
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#   Function: is_game_over()
+#
+#   Pre:
+#
+#   Post:
+#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+def represents_int(string):
+    return re.match(r"[-+]?\d+$", string) is not None
+
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #   Function: cls(#)
 #   Pre:
 #
@@ -254,6 +277,61 @@ def is_game_over():
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 def cls():
     os.system('cls' if os.name == 'nt' else 'clear')
+
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#   Function: number_to_letter(integer)
+#
+#   Pre:
+#
+#   Post:
+#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+def number_to_letter(integer):
+    letter_array = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+                    'U', 'V', 'W', 'X', 'Y', 'Z']
+    return letter_array[integer]
+
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#   Function: letter_to_number(letter)
+#
+#   Pre:
+#
+#   Post:
+#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+def letter_to_number(letter):
+    alphabet = 'abcdefghijklmnopqrstuvwxyz'
+    return next((i for i, _letter in enumerate(alphabet) if _letter == letter), None)
+
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#   Function: print_out_board(bool_player)
+#
+#   Pre:
+#
+#   Post:
+#
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+def print_out_board(board, bool_user):
+    # cls() # Clear the screen TODO UN-COMMENT THIS WHEN FINISHED
+
+    user = "User's " if bool_user else "Computer's "
+
+    print(user + 'Board:\n     1     2     3     4     5     6     7     8     9     10\n')
+
+    for i in range(len(board)):
+        print(number_to_letter(i) + "  "),  # THIS COMMA IS NEEDED HERE TO NOT PRINT ON TO THE NEXT LINE!!!!
+        for j in range(len(board)):
+            if j < 9:
+                print ' {:}  |'.format(board[i][j]),  # KEEP THIS COMMA!!!!
+            else:
+                print ' {:}'.format(board[i][j]),  # KEEP THIS COMMA!!!!
+        if i < 9:
+            print('\n   ------------------------------------------------------------')
+
+    print '\n\n\n'
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
