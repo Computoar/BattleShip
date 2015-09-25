@@ -14,9 +14,9 @@ __author__ = 'Emma & Lee'
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #   Function: main()
 #
-#   Pre:
+#   Pre: None.
 #
-#   Post:
+#   Post: Runs the game.
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 def main():
@@ -48,9 +48,10 @@ def welcome_prompt():
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #   Function: run_game()
 #
-#   Pre:
+#   Pre: None.
 #
-#   Post:
+#   Post: Initializes two boards, user and computer. Runs the game. Prints out
+#         the boards. Stops the game when either user or computer wins.
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 def run_game():
@@ -58,10 +59,10 @@ def run_game():
     user_board = initialize_board(True)
     computer_board = initialize_board(False)
 
-    # TODO REMOVE THESE
+    # TODO REMOVE THESE - JUST FOR TEST
     print_out_board(user_board, True)
     print_out_board(computer_board, False)
-    # TODO REMOVE THESE
+    # TODO REMOVE THESE - JUST FOR TEST
 
     # While the game is NOT over, continue playing the game.
     while not is_game_over():
@@ -79,11 +80,12 @@ def run_game():
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#   Function: initialize_board()
+#   Function: initialize_board(bool_user)
 #
-#   Pre:
+#   Pre: Boolean for if we're deciding for the user input or not.
 #
-#   Post:
+#   Post: Initializes the given boards based off of user input (always auto for
+#         the computer).
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 def initialize_board(bool_user):
@@ -98,11 +100,13 @@ def initialize_board(bool_user):
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#   Function: manually_place_ships()
+#   Function: manually_place_ships(bool_user)
 #
-#   Pre:
+#   Pre: Boolean for if we're deciding for the user input or not.
 #
-#   Post:
+#   Post: Initializes a new board (array), and loops through each and every ship
+#         placing the ship at a specified user coordinate if possible. Returns
+#         an initialized board with all pieces on the board.
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 def manually_place_ships(bool_user):
@@ -160,9 +164,9 @@ def manually_place_ships(bool_user):
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #   Function: auto_place_ships()
 #
-#   Pre:
+#   Pre: None.
 #
-#   Post:
+#   Post: A board is initialized, and set with random ship placements, then returned.
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 def auto_place_ships():
@@ -184,11 +188,13 @@ def auto_place_ships():
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#   Function: can_place(list)
+#   Function: can_place(board, ship, y, x, o)
 #
-#   Pre:
+#   Pre: The board, ship (length), y coordinate, x coordinate, and orientation
+#        are passed in.
 #
-#   Post:
+#   Post: Checks the board's positions at x and y to see if something is already
+#         placed in that location.
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 def can_place(board, ship, y, x, o):
@@ -210,11 +216,14 @@ def can_place(board, ship, y, x, o):
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#   Function: place_ship(list)
+#   Function: place_ship(board, ship, name, y, x, o)
 #
-#   Pre:
+#   Pre: The board, ship (length), name (character), y coordinate, x coordinate,
+#        and orientation are passed in.
 #
-#   Post:
+#   Post: The board's positions at the y and x coordinate are set equal to the
+#         name, as well as the remainder of the length of the ship for it's
+#         orientation.
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 def place_ship(board, ship, name, y, x, o):
@@ -277,11 +286,12 @@ def is_game_over():
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#   Function: is_game_over()
+#   Function: represents_int(string)
 #
-#   Pre:
+#   Pre: String (char) is passed in.
 #
-#   Post:
+#   Post: Returns true if the character represents an integer or not. Does NOT
+#         check for floating point numbers.
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 def represents_int(string):
@@ -289,10 +299,10 @@ def represents_int(string):
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#   Function: cls(#)
-#   Pre:
+#   Function: cls()
+#   Pre: None.
 #
-#   Post:
+#   Post: The console screen is cleared.
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 def cls():
@@ -302,9 +312,9 @@ def cls():
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #   Function: number_to_letter(integer)
 #
-#   Pre:
+#   Pre: An integer is passed in.
 #
-#   Post:
+#   Post: The letter at the integer's position in the array is returned i.e 0 = a.
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 def number_to_letter(integer):
@@ -316,9 +326,11 @@ def number_to_letter(integer):
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #   Function: letter_to_number(letter)
 #
-#   Pre:
+#   Pre: A string letter is passed in.
 #
-#   Post:
+#   Post: The letter is then checked through the array of chars (alphabet), and
+#         returned as a character in that position i.e. a = 0, b = 1, c = 2. If
+#         the character is not found in alphabet, None is returned.
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 def letter_to_number(letter):
@@ -327,11 +339,12 @@ def letter_to_number(letter):
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#   Function: print_out_board(bool_player)
+#   Function: print_out_board(board, bool_user)
 #
-#   Pre:
+#   Pre: An initialized board (array) is passed in.
 #
-#   Post:
+#   Post: The board (array) is printed out to the console, showing all elements
+#         in the array in a grid-like way.
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 def print_out_board(board, bool_user):
