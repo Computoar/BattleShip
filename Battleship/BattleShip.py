@@ -87,16 +87,14 @@ def run_game():
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 def initialize_board(bool_user):
-    # Checks if the input is lowercase y
     if bool_user:
+        # Checks if the input is lowercase y
         if raw_input('Would you like to have your ships auto-deployed? y or n: ').lower() == "y":
-            # Obviously yes, so auto-place ships.
-            return auto_place_ships()
+            return auto_place_ships()  # Obviously yes, so auto-place ships.
         else:
-            # Manually place them...false
-            return manually_place_ships(True)
+            return manually_place_ships(True)  # Manually place them...false
     else:
-        return auto_place_ships()
+        return auto_place_ships()  # Not the user, so auto-place them.
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -148,7 +146,7 @@ def manually_place_ships(bool_user):
                 print('Your row should be a letter.')
                 continue
 
-            x = int(position[1])-1  # Assign x position
+            x = int(position[1]) - 1  # Assign x position
             y = letter_to_number(position[0])  # Assign y position
             o = 0 if position[2] == 'v' else 1  # Assign vertical/horizontal
 
@@ -343,15 +341,32 @@ def print_out_board(board, bool_user):
 
     print(user + 'Board:\n     1     2     3     4     5     6     7     8     9     10\n')
 
-    for i in range(len(board)):
-        print(number_to_letter(i) + "  "),  # THIS COMMA IS NEEDED HERE TO NOT PRINT ON TO THE NEXT LINE!!!!
-        for j in range(len(board)):
-            if j < 9:
-                print ' {:}  |'.format(board[i][j]),  # KEEP THIS COMMA!!!!
-            else:
-                print ' {:}'.format(board[i][j]),  # KEEP THIS COMMA!!!!
-        if i < 9:
-            print('\n   ------------------------------------------------------------')
+    if not bool_user:  # Computer's board (only show hits/misses)
+        for i in range(len(board)):
+            print(number_to_letter(i) + "  "),  # THIS COMMA IS NEEDED HERE TO NOT PRINT ON TO THE NEXT LINE!!!!
+            for j in range(len(board)):
+                if j < 9:
+                    if board[i][j] == "*" or board[i][j] == "$":
+                        print ' {:}  |'.format(board[i][j]),  # KEEP THIS COMMA!!!!
+                    else:
+                        print '    |'.format(board[i][j]),  # KEEP THIS COMMA!!!!
+                else:
+                    if board[i][j] == "*" or board[i][j] == "$":
+                        print ' {:}'.format(board[i][j]),  # KEEP THIS COMMA!!!!
+                    else:
+                        print '  '.format(board[i][j]),  # KEEP THIS COMMA!!!!
+            if i < 9:
+                print('\n   ------------------------------------------------------------')
+    else:  # User's board (show everything)
+        for i in range(len(board)):
+            print(number_to_letter(i) + "  "),  # THIS COMMA IS NEEDED HERE TO NOT PRINT ON TO THE NEXT LINE!!!!
+            for j in range(len(board)):
+                if j < 9:
+                    print ' {:}  |'.format(board[i][j]),  # KEEP THIS COMMA!!!!
+                else:
+                    print ' {:}'.format(board[i][j]),  # KEEP THIS COMMA!!!!
+            if i < 9:
+                print('\n   ------------------------------------------------------------')
 
     print '\n\n\n'
 
