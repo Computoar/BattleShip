@@ -94,7 +94,7 @@ def initialize_board(bool_user):
             return auto_place_ships()
         else:
             # Manually place them...false
-            return manually_place_ships()
+            return manually_place_ships(True)
     else:
         return auto_place_ships()
 
@@ -107,48 +107,55 @@ def initialize_board(bool_user):
 #   Post:
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-def manually_place_ships():
+def manually_place_ships(bool_user):
     board = ([[' ' for z in range(10)] for z in range(10)])  # Initialize board's slots to ' '. A 10x10 board is made.
     ships = {"Aircraft carrier": 5, "Battleship": 4, "Submarine": 3, "Destroyer": 3, "Patrol boat": 2}  # Ship list
 
     for ship in ships.keys():
         valid = False
         count = 0
+
+        if bool_user:
+            print_out_board(board, bool_user)
+            print "This is how your board looks.\n"
+
         while not valid:  # Loop through the validation, choosing random numbers till spot is found.
             if count == 0:
                 placement = raw_input(
-                    'Please enter your coordinate points for the ' + ship + ' (col, row, v/h): ').lower()
+                    'Please enter your coordinate points for the ' + ship + ' (row, col, v/h): ').lower()
                 count += 1  # Add 1 to the count
             else:
                 placement = raw_input(
-                    'Invalid placement, please try again for the ' + ship + ' (col, row, v/h): ').lower()
+                    'Invalid placement, please try again for the ' + ship + ' (row, col, v/h): ').lower()
 
             position = placement.strip('()')  # Remove the '(' and ')' if the user entered them.
             position = position.replace(' ', '')  # Remove all blank space.
-            position = position.split(",")  # Position is now an array of strings.
+            position = position.split(",")  # Position is now an array of strings. Position is now an array.
 
-            print(position[0])
-            print(position[1])
-            print(position[2])
-
-            if position[2] != 'v' or position[2] != 'h':
-                print("Not a 'v' or 'h'")
+            if len(position) != 3:
+                print("Too few arguments." if len(position) < 3 else "Too many arguments.")
                 continue
 
-            if not represents_int(position[0]):
-                print('Col is wrong')
+            if (position[2] != "v") and (position[2] != "h"):
+                print("You did not select a 'v' or an 'h'.")
                 continue
 
             if not represents_int(position[1]):
-                print('Hor is wrong')
+                print('Your column should be number.')
                 continue
 
-            x = int(position[0])  # Assign x position
-            y = int(position[1])  # Assign y position
+            if not represents_int(letter_to_number(position[0])):
+                print('Your row should be a letter.')
+                continue
+
+            x = int(position[1])-1  # Assign x position
+            y = letter_to_number(position[0])  # Assign y position
             o = 0 if position[2] == 'v' else 1  # Assign vertical/horizontal
 
-            valid = can_place(board, ships[ship], x, y, o)  # Make sure we can place the ship there.
-        board = place_ship(board, ships[ship], ship[0], x, y, o)  # We passed the tests, place the ship at that spot
+            valid = can_place(board, ships[ship], y, x, o)  # Make sure we can place the ship there.
+
+        board = place_ship(board, ships[ship], ship[0], y, x, o)  # We passed the tests, place the ship at that spot
+
     return board
 
 
@@ -167,11 +174,14 @@ def auto_place_ships():
     for ship in ships.keys():
         valid = False
         while not valid:  # Loop through the validation, choosing random numbers till spot is found.
-            x = random.randint(0, 9)  # Choose random number 0-9
-            y = random.randint(0, 9)
+            y = random.randint(0, 9)  # Choose random number 0-9
+            x = random.randint(0, 9)
             o = random.randint(0, 1)
-            valid = can_place(board, ships[ship], x, y, o)  # Make sure we can place the ship there.
-        board = place_ship(board, ships[ship], ship[0], x, y, o)  # We passed the tests, place the ship at that spot
+            valid = can_place(board, ships[ship], y, x, o)  # Make sure we can place the ship there.
+        board = place_ship(board, ships[ship], ship[0], y, x, o)  # We passed the tests, place the ship at that spot
+        print(str(y) + ship[0])
+        print(str(x) + ship[0])
+        print(str(o) + ship[0])
     return board
 
 
@@ -183,19 +193,19 @@ def auto_place_ships():
 #   Post:
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-def can_place(board, ship, x, y, o):
-    if o == 0 and x + ship > 10:  # Vertical
+def can_place(board, ship, y, x, o):
+    if o == 0 and y + ship > 10:  # Vertical
         return False
-    elif o == 1 and y + ship > 10:  # Horizontal
+    elif o == 1 and x + ship > 10:  # Horizontal
         return False
     else:
         if o == 0:  # Vertical
             for i in range(ship):
-                if board[x + i][y] != ' ':
+                if board[y + i][x] != ' ':
                     return False
         elif o == 1:  # Horizontal
             for i in range(ship):
-                if board[x][y + i] != ' ':
+                if board[y][x + i] != ' ':
                     return False
 
     return True
@@ -209,13 +219,13 @@ def can_place(board, ship, x, y, o):
 #   Post:
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-def place_ship(board, ship, name, x, y, o):
+def place_ship(board, ship, name, y, x, o):
     if o == 0:  # Vertical
         for i in range(ship):
-            board[x + i][y] = name
+            board[y + i][x] = name
     elif o == 1:  # Horizontal
         for i in range(ship):
-            board[x][y + i] = name
+            board[y][x + i] = name
     return board
 
 
@@ -277,7 +287,7 @@ def is_game_over():
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 def represents_int(string):
-    return re.match(r"[-+]?\d+$", string) is not None
+    return (isinstance(string, int)) or (re.match(r"[-+]?\d+$", string) is not None)
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
