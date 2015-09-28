@@ -59,24 +59,21 @@ def run_game():
     user_board = initialize_board(True)
     computer_board = initialize_board(False)
 
-    # TODO REMOVE THESE - JUST FOR TEST
-    print_out_board(user_board, True)
-    print_out_board(computer_board, False)
-    # TODO REMOVE THESE - JUST FOR TEST
-
     # While the game is NOT over, continue playing the game.
-    while not is_game_over():
+    while True:
         print_out_board(user_board, True)
         make_move_user()
-        is_ship_sunken()
-        if is_game_over():
+        is_ship_sunken(user_board)
+        if is_game_over(user_board):
             print 'GAME OVER! You won! WOOHOO!'
+            break  # End the game, stop the while loop.
 
         print_out_board(computer_board, False)
         make_move_comp()
-        is_ship_sunken()
-        if is_game_over():
+        is_ship_sunken(computer_board)
+        if is_game_over(computer_board):
             print 'GAME OVER! Computer beat ya...'
+            break  # End the game, stop the while loop.
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -118,6 +115,7 @@ def manually_place_ships(bool_user):
         count = 0
 
         if bool_user:
+            cls()
             print_out_board(board, bool_user)
             print "This is how your board looks.\n"
 
@@ -181,9 +179,6 @@ def auto_place_ships():
             o = random.randint(0, 1)
             valid = can_place(board, ships[ship], y, x, o)  # Make sure we can place the ship there.
         board = place_ship(board, ships[ship], ship[0], y, x, o)  # We passed the tests, place the ship at that spot
-        print(str(y) + ship[0])
-        print(str(x) + ship[0])
-        print(str(o) + ship[0])
     return board
 
 
@@ -268,8 +263,17 @@ def make_move_comp():
 #   Post:
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-def is_ship_sunken():
-    print 'is sunken'
+def is_ship_sunken(board):
+    ships = {"A": 5, "B": 4, "S": 3, "D": 3, "P": 2}  # Ship list
+
+    for ship in ships:  # For every ship in the list (A, B, S, D)
+        temp_counter = 0
+        for x in range(len(board)):  # Go through the board right to left, up to down.
+            for y in range(len(board)):
+                if board[x][y] == ship:
+                    temp_counter += 1
+        if temp_counter == 0:
+            print("Ship sunk: " + ship)
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -280,9 +284,22 @@ def is_ship_sunken():
 #   Post:
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-def is_game_over():
-    print 'game over'
-    return True
+def is_game_over(board):
+    ships = {"A": 5, "B": 4, "S": 3, "D": 3, "P": 2}  # Ship list
+    ships_left = 0
+    for ship in ships:  # For every ship in the list (A, B, S, D)
+        temp_counter = 0
+        for x in range(len(board)):  # Go through the board right to left, up to down.
+            for y in range(len(board)):
+                if board[x][y] == ship:
+                    temp_counter += 1
+        if temp_counter > 0:  # There's 1 or more spots in the ship left to hit.
+            ships_left += 1  # So, there is still a ship left.
+
+    if ships_left == 0:  # If there are no more ships left, then the game is over.
+        return True
+
+    return False  # Game isn't over.
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -350,7 +367,7 @@ def letter_to_number(letter):
 def print_out_board(board, bool_user):
     # cls() # Clear the screen TODO UN-COMMENT THIS WHEN FINISHED
 
-    user = "User's " if bool_user else "Computer's "
+    user = "User's " if bool_user else "Computer's "  # Display board name.
 
     print(user + 'Board:\n     1     2     3     4     5     6     7     8     9     10\n')
 
@@ -370,6 +387,7 @@ def print_out_board(board, bool_user):
                         print '  '.format(board[i][j]),  # KEEP THIS COMMA!!!!
             if i < 9:
                 print('\n   ------------------------------------------------------------')
+
     else:  # User's board (show everything)
         for i in range(len(board)):
             print(number_to_letter(i) + "  "),  # THIS COMMA IS NEEDED HERE TO NOT PRINT ON TO THE NEXT LINE!!!!
@@ -381,7 +399,7 @@ def print_out_board(board, bool_user):
             if i < 9:
                 print('\n   ------------------------------------------------------------')
 
-    print '\n\n\n'
+    print '\n\n'
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
