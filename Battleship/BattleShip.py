@@ -59,18 +59,24 @@ def run_game():
     user_board = initialize_board(True)
     computer_board = initialize_board(False)
 
+    # Initialize the ships each player has to start with.
+    user_ships = {"A": 5, "B": 4, "S": 3, "D": 3, "P": 2}  # Ship list
+    computer_ships = {"A": 5, "B": 4, "S": 3, "D": 3, "P": 2}  # Ship list
+
     # While the game is NOT over, continue playing the game.
     while True:
+        cls()
         print_out_board(user_board, True)
         make_move_user()
-        is_ship_sunken(user_board)
+        user_ships = is_ship_sunken(user_board, user_ships)
         if is_game_over(user_board):
             print 'GAME OVER! You won! WOOHOO!'
             break  # End the game, stop the while loop.
 
+        cls()
         print_out_board(computer_board, False)
         make_move_comp()
-        is_ship_sunken(computer_board)
+        computer_ships = is_ship_sunken(computer_board, computer_ships)
         if is_game_over(computer_board):
             print 'GAME OVER! Computer beat ya...'
             break  # End the game, stop the while loop.
@@ -263,9 +269,7 @@ def make_move_comp():
 #   Post:
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-def is_ship_sunken(board):
-    ships = {"A": 5, "B": 4, "S": 3, "D": 3, "P": 2}  # Ship list
-
+def is_ship_sunken(board, ships):
     for ship in ships:  # For every ship in the list (A, B, S, D)
         temp_counter = 0
         for x in range(len(board)):  # Go through the board right to left, up to down.
@@ -274,6 +278,9 @@ def is_ship_sunken(board):
                     temp_counter += 1
         if temp_counter == 0:
             print("Ship sunk: " + ship)
+            if ship in ships:
+                ships.remove(ship)
+    return ships
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
