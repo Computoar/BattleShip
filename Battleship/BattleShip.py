@@ -66,18 +66,19 @@ def run_game():
     # While the game is NOT over, continue playing the game.
     while True:
         cls()
-        print_out_board(user_board, True)
-        make_move_user()
-        user_ships = is_ship_sunken(user_board, user_ships)
-        if is_game_over(user_board):
+        print_out_board(computer_board, False)
+        make_move_user(computer_board)
+        computer_ships = is_ship_sunken(computer_board, computer_ships)
+        if is_game_over(computer_board):
             print 'GAME OVER! You won! WOOHOO!'
             break  # End the game, stop the while loop.
 
         cls()
-        print_out_board(computer_board, False)
-        make_move_comp()
-        computer_ships = is_ship_sunken(computer_board, computer_ships)
-        if is_game_over(computer_board):
+        print_out_board(user_board, True)
+        make_move_comp(user_board)
+        raw_input('Press ENTER to continue...')
+        user_ships = is_ship_sunken(user_board, user_ships)
+        if is_game_over(user_board):
             print 'GAME OVER! Computer beat ya...'
             break  # End the game, stop the while loop.
 
@@ -199,9 +200,9 @@ def auto_place_ships():
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 def can_place(board, ship, y, x, o):
-    if o == 0 and y + ship > 10:  # Vertical
+    if (o == 0 and y + ship > 10) or y < 0:  # Vertical
         return False
-    elif o == 1 and x + ship > 10:  # Horizontal
+    elif (o == 1 and x + ship > 10) or x < 0:  # Horizontal
         return False
     else:
         if o == 0:  # Vertical
@@ -238,15 +239,68 @@ def place_ship(board, ship, name, y, x, o):
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#   Function: make_move_user()
+#   Function: make_move_user(board)
 #
 #   Pre:
 #
 #   Post:
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-def make_move_user():
-    print 'Make move user'
+def make_move_user(board):
+    ships = {"A": 5, "B": 4, "S": 3, "D": 3, "P": 2}  # Ship list
+    count = 0
+
+    while True:  # Loop through the validation, choosing random numbers till spot is found.
+        if count == 0:
+            placement = raw_input(
+                'Please enter your coordinate points for your move (row, col): ').lower()
+            count += 1  # Add 1 to the count
+        else:
+            placement = raw_input(
+                'Invalid placement, please try again for the (row, col): ').lower()
+
+        position = placement.strip('()')  # Remove the '(' and ')' if the user entered them.
+        position = position.replace(' ', '')  # Remove all blank space.
+        position = position.split(",")  # Position is now an array of strings. Position is now an array.
+
+        if len(position) != 2:
+            print("Too few arguments." if len(position) < 2 else "Too many arguments.")
+            continue
+
+        if not represents_int(position[1]):
+            print('Your column should be number.')
+            continue
+
+        if not represents_int(letter_to_number(position[0])):
+            print('Your row should be a letter.')
+            continue
+
+        x = int(position[1]) - 1  # Assign x position
+        y = letter_to_number(position[0])  # Assign y position
+
+        if y >= 10 or y < 0:
+            print('Your column was too high. ' if y >= 10 else 'Your columns was too low.')
+            continue
+
+        if x >= 10 or x < 0:
+            print('Your row was too high. ' if x >= 10 else 'Your row was too low.')
+            continue
+
+        if board[y][x] == '*' or board[y][x] == '$':  # If the spot is a hit or a miss
+            print('You already chose this point.')  # Inform the user that they already used this point.
+            continue
+
+        if board[y][x] == ' ':  # The spot is empty
+            board[y][x] = '*'  # Mark it as a miss
+            print('Miss!')
+            break
+
+        for ship in ships:
+            if board[y][x] == ship:  # If the spot is a ship
+                board[y][x] = '$'  # Mark it as a hit
+                print('HIT!!!!')
+                break
+        break
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -257,8 +311,27 @@ def make_move_user():
 #   Post:
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-def make_move_comp():
-    print 'Make move comp'
+def make_move_comp(board):
+    ships = {"A": 5, "B": 4, "S": 3, "D": 3, "P": 2}  # Ship list
+
+    while True:  # Loop through the validation, choosing random numbers till spot is found.
+        y = random.randint(0, 9)  # Choose random number 0-9
+        x = random.randint(0, 9)
+
+        if board[y][x] == '*' or board[y][x] == '$':
+            continue
+
+        if board[y][x] == ' ':
+            board[y][x] = '*'
+            print('Computer misses at (' + number_to_letter(y) + ', ' + str(x+1) + ')!')
+            break
+
+        for ship in ships:
+            if board[y][x] == ship:
+                board[y][x] = '$'
+                print('Computer hit at (' + number_to_letter(y) + ', ' + str(x+1) + ')!')
+                break
+        break
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -270,7 +343,8 @@ def make_move_comp():
 #
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 def is_ship_sunken(board, ships):
-    for ship in ships:  # For every ship in the list (A, B, S, D)
+    sunken_ship = 0
+    for ship in ships:  # For every ship in the list (A, B, S, D, P)
         temp_counter = 0
         for x in range(len(board)):  # Go through the board right to left, up to down.
             for y in range(len(board)):
@@ -278,9 +352,12 @@ def is_ship_sunken(board, ships):
                     temp_counter += 1
         if temp_counter == 0:
             print("Ship sunk: " + ship)
-            if ship in ships:
-                ships.remove(ship)
-    return ships
+            sunken_ship = ship
+
+    if sunken_ship in ships:  # Remove the ship from the list, so we don't display that we hit it again.
+                del ships[sunken_ship]
+
+    return ships  # Return the new array.
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
