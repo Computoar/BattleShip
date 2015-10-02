@@ -72,9 +72,9 @@ def run_game():
         if is_game_over(computer_board):
             print 'GAME OVER! You won! WOOHOO!'
             break  # End the game, stop the while loop.
+        raw_input('Press ENTER to continue...')
 
         cls()
-        print_out_board(user_board, True)
         make_move_comp(user_board)
         raw_input('Press ENTER to continue...')
         user_ships = is_ship_sunken(user_board, user_ships)
@@ -292,12 +292,16 @@ def make_move_user(board):
 
         if board[y][x] == ' ':  # The spot is empty
             board[y][x] = '*'  # Mark it as a miss
+            cls()
+            print_out_board(board, False)
             print('Miss!')
             break
 
         for ship in ships:
             if board[y][x] == ship:  # If the spot is a ship
                 board[y][x] = '$'  # Mark it as a hit
+                cls()
+                print_out_board(board, False)
                 print('HIT!!!!')
                 break
         break
@@ -323,12 +327,16 @@ def make_move_comp(board):
 
         if board[y][x] == ' ':
             board[y][x] = '*'
+            cls()
+            print_out_board(board, True)
             print('Computer misses at (' + number_to_letter(y) + ', ' + str(x+1) + ')!')
             break
 
         for ship in ships:
             if board[y][x] == ship:
                 board[y][x] = '$'
+                cls()
+                print_out_board(board, True)
                 print('Computer hit at (' + number_to_letter(y) + ', ' + str(x+1) + ')!')
                 break
         break
