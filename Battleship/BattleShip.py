@@ -3,7 +3,7 @@ import re
 import random
 import time
 
-__author__ = 'Emma & Lee'
+__author__ = 'Lee'
 
 
 # '''
