@@ -3,8 +3,6 @@ import re
 import random
 import time
 
-__author__ = 'Lee'
-
 
 # '''
 # Program Prologue
